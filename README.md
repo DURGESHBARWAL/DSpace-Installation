@@ -4,8 +4,19 @@ This Repo Contains the DSpace Installation Steps
 # Installation Steps
 
 1. Install Ubuntu 
+      
 2. Prepare Ubuntu
-                -----------------------------------------------------------------------
+          NOTE:
+          
+          All Installation Steps is based on Considering that User Account name is "dspace".
+          If you want create a new User Account follow the steps below.
+          
+          $ sudo adduser dspace
+          
+          $ su dspace
+          
+          $ cd
+          
   2.1 Install the Java software dependencies
    
    2.1.1 Install Java
@@ -19,7 +30,8 @@ This Repo Contains the DSpace Installation Steps
    2.1.3 Install Ant
    
         $ sudo apt-get install ant ant-optional
-              --------------------------------------------------------------------------  
+
+
   2.2 Install the Maven Java WAR builder
    
    2.2.1 Install maven
@@ -571,8 +583,104 @@ This Repo Contains the DSpace Installation Steps
           
           
 4. To Activate the APIs for DSpace
-
-
+        Disabling SSL          
+                  For localhost development purposes, SSL can add additional getting-started difficulty,
+                  so security can be         disabled. To disable DSpace REST's requirement to require security/ssl, 
+                  [dspace-source]/dspace-rest/src/main/webapp/WEB-INF/web.xml and comment out the 
+                  <security-constraint> block, and restart your servlet container.
+  
+      
+     4.1 Create a scripts folder
+     
+        $ mkdir $HOME/scripts
+        
+     4.2  Create the script
+     
+        $ nano $HOME/scripts/build-webapps
+     
+        Copy and paste the following into the open nano editor.
+        ------------------------------------------------------------------------------------------------------
+          #!/bin/bash
           
+          
+          sudo service tomcat7 stop
+          sleep 3
+
+          #### Optional ####
+          #Remove old cache and log files. Uncomment below to enable.
+          #echo "Clean out old xmlui cache files"
+          #sudo rm /var/lib/tomcat7/work/Catalina/localhost/_/cache-dir/cocoon-ehcache.data
+          #sudo rm /var/lib/tomcat7/work/Catalina/localhost/_/cache-dir/cocoon-ehcache.index
+          #echo "Remove old catalina log file"
+          #sudo rm /var/log/tomcat7/catalina.out
+
+          #### Optional ####
+          #Remove old webapps. Uncomment below to enable.
+          #echo "Clean out old webapps"
+          #sudo rm -rf /home/dspace/webapps/*
+
+          #### Optional ####
+          #Remove old config folder. Uncomment below to enable.
+          #echo "Clean out old configs"
+          #sudo rm -rf /home/dspace/config/*
+
+          echo "Start MAVEN build"
+          cd /home/dspace/source
+          mvn -U clean package
+
+          echo "Start ANT updates"
+          cd /home/dspace/source/dspace/target/dspace-installer
+          ant update
+
+          #### Optional ####
+          #Clean backups. Uncomment below to enable.
+          #ant clean_backups
+
+          #### Optional ####
+          #Overwrite configs. Uncomment below to enable.
+          #ant -Doverwrite=true update_configs
+
+          #### Optional ####
+          #Geolite database updates.
+          # !!!! Your server should be open on the internet before you do this !!!!
+          #Uncomment below to enable.
+          #sudo ant update_geolite
+
+          #### Optional ####
+          #Fix file and folder permissions. Uncomment below to enable.
+          #echo "Fixing file permissions. Please wait..."
+          #sudo chmod 0777 -R /home/dspace/config
+          #sudo chmod 0777 -R /home/dspace/log
+          #echo "Fixing file ownership. Please wait..."
+          #sudo chown dspace.tomcat7 -R /home/dspace/config
+          #sudo chown dspace.tomcat7 -R /home/dspace/log
+
+          sleep 2
+          sudo service tomcat7 restart
+
+          echo "Rebuild complete."
+        -------------------------------------------------------------------------------------------------------
+
+     4.3 Make the script executable
+     
+        $ chmod 0755 $HOME/scripts/build-webapps
+  
+     4.4 Run the script
+     
+        $ $HOME/scripts/build-webapps
+        
+        ===============================================================================================================
+        
+        You can check the working of DSpace APIs using below command through terminal.
+        
+        $ curl http://localhost/rest/test
+        
+        Response Example:
+        ------------------------------------
+        REST api is running.
+        ------------------------------
+        
+
+          =============================================================================================================
        
            
