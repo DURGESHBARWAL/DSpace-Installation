@@ -294,7 +294,7 @@ This Repo Contains the DSpace Installation Steps
           
    2.4.8 Setup maximum number of PostgreSQL server client connections
    
-          $ sudo nano /etc/postgresql/9.3/main/postgresql.conf
+          $ sudo nano /etc/postgresql/9.5/main/postgresql.conf
           
           Change the number of "max_connections" to 300. Please note: If you get connection errors, then adjust this value!
           Save and exit the file. 
